@@ -1,0 +1,50 @@
+likelihood:
+  lyalike.lya.Tester: 
+    python_path: /Users/Pablo/Code/LyaLike/
+theory:
+  camb: null
+  lyalike.lya.Lya: 
+    python_path: /Users/Pablo/Code/LyaLike/
+
+params:
+  H0: 67.0
+  ns: 0.96
+  logA:
+    prior:
+      min: 1.61
+      max: 3.91
+    latex: \log(10^{10} A_\mathrm{s})
+    drop: true
+  As:
+    value: 'lambda logA: 1e-10*np.exp(logA)'
+    latex: A_\mathrm{s}
+  omegab:
+    value: 0.04914741792
+    latex: \Omega_\mathrm{b}
+    drop: true
+  omegam:
+    prior:
+      min: 0.1
+      max: 0.9
+    latex: \Omega_\mathrm{m}
+    drop: true
+  omegab: 
+    value: 0.005
+    latex: \Omega_\mathrm{b}
+    drop: true
+  ombh2:
+    value: 'lambda omegab, H0: omegab*(H0/100)**2'
+    latex: \Omega_\mathrm{b} h^2
+  omch2:
+    value: 'lambda omegam, omegab, mnu, H0: (omegam-omegab)*(H0/100)**2-(mnu*(3.046/3)**0.75)/94.0708'
+    latex: \Omega_\mathrm{c} h^2
+  tau: 0.6
+  mnu: 0.06
+
+debug: false
+stop_at_error: true
+sampler:
+  mcmc:
+    max_tries: 1000
+
+output: chains/test
