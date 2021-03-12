@@ -18,10 +18,6 @@ params:
   As:
     value: 'lambda logA: 1e-10*np.exp(logA)'
     latex: A_\mathrm{s}
-  omegab:
-    value: 0.04914741792
-    latex: \Omega_\mathrm{b}
-    drop: true
   omegam:
     prior:
       min: 0.1

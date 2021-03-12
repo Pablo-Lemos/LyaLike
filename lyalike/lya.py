@@ -12,7 +12,7 @@ class Lya(Theory):
     # Default options can be set globally, and updated from requirements as needed
 
     kmax: float = 0  # Maximum k (1/Mpc units) for Pk, or zero if not needed
-    nonlinear: bool = False  # whether to get non-linear Pk from CAMB/Class
+    #nonlinear: bool = False  # whether to get non-linear Pk from CAMB/Class
     #z: Union[Sequence, np.ndarray] = []  # redshift sampling
     #extra_args: dict = {}  # extra (non-parameter) arguments passed to ccl.Cosmology()
 
@@ -52,14 +52,16 @@ class Lya(Theory):
         needs = {}
 
         if self.kmax:
-            self.nonlinear = self.nonlinear or options.get('nonlinear', False)
+            #self.nonlinear = self.nonlinear or options.get('nonlinear', False)
             self._var_pairs.update(
                 set((x, y) for x, y in
                     options.get('vars_pairs', [('delta_tot', 'delta_tot')])))
 
             needs['Pk_grid'] = {
-                'vars_pairs': self._var_pairs or [('delta_tot', 'delta_tot')],
-                'nonlinear': (True, False) if self.nonlinear else False,
+                #'vars_pairs': self._var_pairs or [('delta_tot', 'delta_tot')],
+                #'nonlinear': (True, False) if self.nonlinear else False,
+                'vars_pairs': [('delta_tot', 'delta_tot')],
+                'nonlinear': False,
                 'z': self.z,
                 'k_max': self.kmax
             }
@@ -79,8 +81,8 @@ class Lya(Theory):
                 # Get the matter power spectrum:
                 k_hMpc, _, Pk_lin = self.provider.get_Pk_grid(var_pair=pair, nonlinear=False)
 
-                if self.nonlinear:
-                    k, z, Pk_nonlin = self.provider.get_Pk_grid(var_pair=pair, nonlinear=True)
+                #if self.nonlinear:
+                    #k, z, Pk_nonlin = self.provider.get_Pk_grid(var_pair=pair, nonlinear=True)
 
         # use CAMB results to convert Mpc/h to km/s at pivot redshift
         hubble_z=self.provider.get_Hubble(self.z)
@@ -119,8 +121,7 @@ class Tester(Likelihood):
 
     def get_requirements(self):
         return {'Lya': {"methods": {'test_method': self.test_method},
-                        "kmax": 10,
-                        "nonlinear": True}}
+                        "kmax": 10}}
 
     def test_method(self, cosmo):
         z_n = np.linspace(0., 1., 200)
