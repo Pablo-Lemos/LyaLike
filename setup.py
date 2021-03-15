@@ -4,11 +4,11 @@
 from setuptools import setup
 
 setup(
-    name="lya",
+    name="lyalike",
     version="0.0",
     description="Lyman alpha Likelihoods & Theories",
     zip_safe=False,
-    packages=["lya"],
+    packages=["lyalike"],
     install_requires=[
         "cobaya @ git+https://github.com/cobayasampler/cobaya",
         ],
