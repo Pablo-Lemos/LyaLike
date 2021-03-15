@@ -55,12 +55,12 @@ class Lya(Theory):
             #self.nonlinear = self.nonlinear or options.get('nonlinear', False)
             self._var_pairs.update(
                 set((x, y) for x, y in
-                    options.get('vars_pairs', [('delta_tot', 'delta_tot')])))
+                    options.get('vars_pairs', [('delta_nonu', 'delta_nonu')])))
 
             needs['Pk_grid'] = {
-                #'vars_pairs': self._var_pairs or [('delta_tot', 'delta_tot')],
+                #'vars_pairs': self._var_pairs or [('delta_nonu', 'delta_nonu')],
                 #'nonlinear': (True, False) if self.nonlinear else False,
-                'vars_pairs': [('delta_tot', 'delta_tot')],
+                'vars_pairs': [('delta_nonu', 'delta_nonu')],
                 'nonlinear': False,
                 'z': self.z,
                 'k_max': self.kmax
@@ -79,18 +79,21 @@ class Lya(Theory):
         if self.kmax:
             for pair in self._var_pairs:
                 # Get the matter power spectrum:
-                k_hMpc, _, Pk_lin = self.provider.get_Pk_grid(var_pair=pair, nonlinear=False)
+                k_Mpc, _, Pk_lin_Mpc = self.provider.get_Pk_grid(var_pair=pair, nonlinear=False)
 
                 #if self.nonlinear:
                     #k, z, Pk_nonlin = self.provider.get_Pk_grid(var_pair=pair, nonlinear=True)
 
         # use CAMB results to convert Mpc/h to km/s at pivot redshift
         hubble_z=self.provider.get_Hubble(self.z)
-        H0 = hubble_z[0]
+        h = hubble_z[0]/100.0
+        k_hMpc = k_Mpc/h
+        Pk_lin_hMpc = Pk_lin_Mpc[1] *h**3
         H_z = hubble_z[-1]
-        dvdX=H_z/(1+self.z[-1])/(H0/100.0)
+        dvdX=H_z/(1+self.z[-1])/h
+
         k_kms=k_hMpc/dvdX
-        P_kms=Pk_lin[0]*dvdX**3
+        P_kms=Pk_lin_hMpc*dvdX**3
 
         # fit polynomial to log power of linear power around kp_kms
         kmin_kms = 0.5*self.kp_kms
@@ -124,13 +127,7 @@ class Tester(Likelihood):
                         "kmax": 10}}
 
     def test_method(self, cosmo):
-        z_n = np.linspace(0., 1., 200)
-        n = np.ones(z_n.shape)
-        tracer1 = ccl.WeakLensingTracer(cosmo, dndz=(z_n, n))
-        tracer2 = ccl.WeakLensingTracer(cosmo, dndz=(z_n, n))
-        ell = np.logspace(np.log10(3), 3)
-        cls = ccl.cls.angular_cl(cosmo, tracer1, tracer2, ell)
-        return cls
+        return None
 
     def logp(self, true_DL2=0.35,true_neff=-2.3, DL2_err=0.004, neff_err=0.003, r = 0.55, **pars):
         results = self.provider.get_Lya()
